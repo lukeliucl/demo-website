@@ -24,27 +24,36 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- 資料庫初始化 ---
+        // --- 核心資料庫 (已配置高品質圖片) ---
         const INITIAL_PRODUCTS = [
             { 
                 id: 1, name: "Urban S1 城市通勤", category: "City", price: 32000, 
                 wh: 400, nm: 45, speed: 25, range: 65, weight: 17.5, stock: 24,
                 colors: ["#1e293b", "#3b82f6", "#f8fafc"],
-                images: ["https://images.unsplash.com/photo-1571068316344-75bc76f77894", "https://images.unsplash.com/photo-1532298229144-0ee0c57515c1"],
+                images: [
+                    "https://images.unsplash.com/photo-1571068316344-75bc76f77894?auto=format&fit=crop&q=80&w=1200",
+                    "https://images.unsplash.com/photo-1532298229144-0ee0c57515c1?auto=format&fit=crop&q=80&w=1200"
+                ],
                 description: "專為現代城市打造。極簡隱藏式電池設計，讓通勤變得輕盈且優雅。配備智慧輔助系統，自動感應踩踏力道。"
             },
             { 
                 id: 2, name: "Peak Pro 山地越野", category: "Mountain", price: 62000, 
                 wh: 800, nm: 95, speed: 45, range: 110, weight: 23.5, stock: 8,
                 colors: ["#064e3b", "#450a0a", "#1e293b"],
-                images: ["https://images.unsplash.com/photo-1622543925917-763c34d1538c", "https://images.unsplash.com/photo-1544133782-b646fe8729fc"],
+                images: [
+                    "https://images.unsplash.com/photo-1622543925917-763c34d1538c?auto=format&fit=crop&q=80&w=1200",
+                    "https://images.unsplash.com/photo-1544133782-b646fe8729fc?auto=format&fit=crop&q=80&w=1200"
+                ],
                 description: "為探險而生。高扭力中置電機與專業級避震系統，無論是林道還是碎石坡，都能輕鬆征服。"
             },
             { 
                 id: 3, name: "Fold X 摺疊便利", category: "Folding", price: 29800, 
                 wh: 360, nm: 35, speed: 25, range: 50, weight: 14.8, stock: 15,
                 colors: ["#9f1239", "#475569", "#ca8a04"],
-                images: ["https://images.unsplash.com/photo-1596472481617-642646261545", "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8"],
+                images: [
+                    "https://images.unsplash.com/photo-1596472481617-642646261545?auto=format&fit=crop&q=80&w=1200",
+                    "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&q=80&w=1200"
+                ],
                 description: "行動自如的代名詞。三段式秒摺設計，讓您可以輕鬆帶入電梯、大眾運輸或汽車後車廂。"
             }
         ];
@@ -60,7 +69,7 @@
         function App() {
             const [page, setPage] = useState('home'); 
             const [selectedProduct, setSelectedProduct] = useState(null);
-            const [viewMode, setViewMode] = useState('user'); // user, admin
+            const [viewMode, setViewMode] = useState('user'); 
 
             const navigateToProduct = (product) => {
                 setSelectedProduct(product);
@@ -76,19 +85,19 @@
                         {viewMode === 'admin' ? (
                             <AdminDashboard products={INITIAL_PRODUCTS} />
                         ) : (
-                            <>
+                            <React.Fragment>
                                 {page === 'home' && <HeroSection onStart={() => setPage('catalog')} />}
                                 {page === 'catalog' && <Catalog onSelect={navigateToProduct} />}
                                 {page === 'detail' && <ProductDetail product={selectedProduct} onBack={() => setPage('catalog')} />}
                                 {page === 'tech' && <TechPage />}
                                 {page === 'service' && <ServicePage />}
-                            </>
+                            </React.Fragment>
                         )}
                     </main>
 
                     <Footer />
 
-                    {/* 後台切換浮動按鈕 */}
+                    {/* 後台切換按鈕 */}
                     <button 
                         onClick={() => { setViewMode(viewMode === 'user' ? 'admin' : 'user'); setPage('home'); }}
                         className="fixed bottom-8 right-8 z-50 w-14 h-14 bg-blue-600 rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 active:scale-95 transition"
@@ -126,7 +135,7 @@
                 <section className="h-screen relative flex items-center px-8">
                     <div className="absolute inset-0 -z-10">
                         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/50 to-transparent" />
-                        <img src="https://images.unsplash.com/photo-1593133030294-05448378546f?q=80&w=2000" className="w-full h-full object-cover" alt="Hero" />
+                        <img src="https://images.unsplash.com/photo-1593133030294-05448378546f?auto=format&fit=crop&q=80&w=2000" className="w-full h-full object-cover" alt="Hero" />
                     </div>
                     <div className="max-w-4xl animate-fade-in">
                         <h1 className="text-6xl md:text-8xl font-black mb-8 leading-none gradient-text">進化，從電力<br/>開始。</h1>
@@ -139,7 +148,7 @@
             );
         }
 
-        // --- 組件: 產品列表 (過濾) ---
+        // --- 組件: Catalog ---
         function Catalog({ onSelect }) {
             const [filter, setFilter] = useState('All');
             const filtered = filter === 'All' ? INITIAL_PRODUCTS : INITIAL_PRODUCTS.filter(p => p.category === filter);
@@ -193,7 +202,7 @@
             );
         }
 
-        // --- 組件: 產品詳情 (360, 客製化) ---
+        // --- 組件: ProductDetail ---
         function ProductDetail({ product, onBack }) {
             const [view, setView] = useState(0);
             const [selectedAcc, setSelectedAcc] = useState([]);
@@ -213,7 +222,6 @@
                     </button>
 
                     <div className="grid lg:grid-cols-2 gap-20 items-start">
-                        {/* 360 賞車模擬 */}
                         <div className="sticky top-32">
                             <div className="relative aspect-[4/3] rounded-[3rem] overflow-hidden bg-slate-900 border border-white/10 group shadow-2xl">
                                 <img src={product.images[view]} className="w-full h-full object-cover transition duration-700" style={{ filter: `drop-shadow(0 0 30px ${activeColor}55)` }} alt={product.name} />
@@ -228,7 +236,6 @@
                                     </div>
                                 </div>
                             </div>
-                            {/* 規格表 */}
                             <div className="grid grid-cols-3 gap-6 mt-10">
                                 <div className="glass p-8 rounded-[2rem] text-center">
                                     <p className="text-[10px] text-slate-500 font-black uppercase mb-2 tracking-widest">續航里程</p>
@@ -245,35 +252,23 @@
                             </div>
                         </div>
 
-                        {/* 選購區域 */}
                         <div className="space-y-12">
                             <div>
                                 <h1 className="text-6xl font-black mb-6 tracking-tight">{product.name}</h1>
                                 <p className="text-slate-400 leading-relaxed mb-8">{product.description}</p>
-                                
                                 <div className="mb-8">
                                     <p className="text-xs font-black tracking-widest text-slate-500 uppercase mb-4">選擇車架顏色</p>
                                     <div className="flex gap-4">
                                         {product.colors.map(c => (
-                                            <button 
-                                                key={c} 
-                                                onClick={() => setActiveColor(c)}
-                                                className={`w-10 h-10 rounded-full border-4 transition ${activeColor === c ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-transparent'}`}
-                                                style={{ backgroundColor: c }}
-                                            />
+                                            <button key={c} onClick={() => setActiveColor(c)} className={`w-10 h-10 rounded-full border-4 transition ${activeColor === c ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-transparent'}`} style={{ backgroundColor: c }} />
                                         ))}
                                     </div>
                                 </div>
-
                                 <div>
                                     <p className="text-xs font-black tracking-widest text-slate-500 uppercase mb-4">專屬配備</p>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {currentAccs.map(acc => (
-                                            <div 
-                                                key={acc.id}
-                                                onClick={() => toggleAcc(acc.id)}
-                                                className={`p-5 rounded-[2rem] border cursor-pointer transition flex items-center justify-between ${selectedAcc.includes(acc.id) ? 'bg-blue-600/10 border-blue-600/50' : 'bg-slate-900 border-white/5 hover:border-white/20'}`}
-                                            >
+                                            <div key={acc.id} onClick={() => toggleAcc(acc.id)} className={`p-5 rounded-[2rem] border cursor-pointer transition flex items-center justify-between ${selectedAcc.includes(acc.id) ? 'bg-blue-600/10 border-blue-600/50' : 'bg-slate-900 border-white/5 hover:border-white/20'}`}>
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-blue-500">
                                                         <i className={`fas ${acc.icon}`}></i>
@@ -289,7 +284,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div className="bg-slate-900 p-10 rounded-[3rem] border border-white/10 flex items-center justify-between">
                                 <div>
                                     <p className="text-[10px] text-slate-500 font-black uppercase mb-1">估計總計</p>
@@ -303,81 +297,40 @@
             );
         }
 
-        // --- 組件: 技術專區 ---
+        // --- 技術與服務頁面 ---
         function TechPage() {
             return (
-                <section className="pt-32 pb-24 px-8 max-w-7xl mx-auto animate-fade-in">
-                    <div className="text-center mb-20">
-                        <span className="text-blue-500 font-bold tracking-[0.3em] uppercase text-xs">Innovation</span>
-                        <h2 className="text-5xl font-black mt-4">重新定義電力管理。</h2>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-16 items-center">
-                        <div className="space-y-12">
-                            <div className="flex gap-8 items-start">
-                                <div className="w-16 h-16 bg-blue-600/10 rounded-3xl flex items-center justify-center text-blue-500 text-2xl shrink-0"><i className="fas fa-microchip"></i></div>
-                                <div>
-                                    <h4 className="text-xl font-bold mb-3">智慧 BMS 4.0</h4>
-                                    <p className="text-slate-400">專屬電池管理系統，隨時監控每顆電芯狀態，不僅提升 20% 的電力效率，更大幅延長電池壽命。</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-8 items-start">
-                                <div className="w-16 h-16 bg-blue-600/10 rounded-3xl flex items-center justify-center text-blue-500 text-2xl shrink-0"><i className="fas fa-mobile-screen-button"></i></div>
-                                <div>
-                                    <h4 className="text-xl font-bold mb-3">全時聯網 App</h4>
-                                    <p className="text-slate-400">透過手機隨時鎖定愛車、查詢導航路徑，甚至能遠端更新電機系統韌體 (OTA)，讓您的車永遠保持最新狀態。</p>
-                                </div>
-                            </div>
+                <section className="pt-32 pb-24 px-8 max-w-7xl mx-auto animate-fade-in text-center">
+                    <h2 className="text-5xl font-black mb-12">智慧 BMS 4.0 技術</h2>
+                    <div className="grid md:grid-cols-2 gap-10">
+                        <div className="glass p-10 rounded-[3rem] text-left">
+                            <i className="fas fa-microchip text-4xl text-blue-500 mb-6"></i>
+                            <h4 className="text-2xl font-bold mb-4">核心管理系統</h4>
+                            <p className="text-slate-400 leading-relaxed">我們開發的第四代電池管理系統，能實時監控 40 節電芯的電壓平衡，將效率極大化。</p>
                         </div>
-                        <div className="relative rounded-[4rem] overflow-hidden border border-white/10 aspect-square">
-                            <img src="https://images.unsplash.com/photo-1544133782-b646fe8729fc?q=80&w=1000" className="w-full h-full object-cover opacity-50" alt="Tech" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center animate-pulse"><i className="fas fa-play text-2xl"></i></div>
-                            </div>
+                        <div className="glass p-10 rounded-[3rem] text-left">
+                            <i className="fas fa-mobile-screen-button text-4xl text-blue-500 mb-6"></i>
+                            <h4 className="text-2xl font-bold mb-4">全時聯網 App</h4>
+                            <p className="text-slate-400 leading-relaxed">透過藍牙與 4G LTE 模組，您的手機能隨時掌握愛車位置，並獲得精確的剩餘續航預估。</p>
                         </div>
                     </div>
                 </section>
             );
         }
 
-        // --- 組件: 服務專區 (地圖) ---
         function ServicePage() {
             return (
-                <section className="pt-32 pb-24 px-8 max-w-7xl mx-auto animate-fade-in">
-                    <div className="grid lg:grid-cols-2 gap-20">
-                        <div>
-                            <h2 className="text-5xl font-black mb-8 leading-tight">全台網點。<br/>隨時提供支援。</h2>
-                            <p className="text-slate-400 mb-10">無論您身在何處，我們的專業技師與試乘據點都在不遠處。全台共有 24 間維修服務站。</p>
-                            <div className="space-y-4">
-                                {['台北旗艦店 - 大安區', '台中智慧站 - 西屯區', '高雄服務中心 - 左營區'].map(loc => (
-                                    <div key={loc} className="glass p-6 rounded-3xl border-white/5 flex items-center gap-6">
-                                        <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-blue-500"><i className="fas fa-location-dot"></i></div>
-                                        <p className="font-bold">{loc}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="bg-slate-900 rounded-[4rem] border border-white/10 h-[500px] relative overflow-hidden">
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1524661135-423995f22d0b')] bg-cover opacity-20" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="relative">
-                                    <div className="absolute -inset-8 bg-blue-500/20 blur-3xl rounded-full animate-pulse" />
-                                    <i className="fas fa-location-pin text-5xl text-blue-600 drop-shadow-[0_0_15px_rgba(37,99,235,0.8)]"></i>
-                                </div>
-                            </div>
-                            <div className="absolute bottom-10 left-10 right-10 glass p-8 rounded-[2rem]">
-                                <h4 className="font-bold mb-4">預約最近的據點試乘</h4>
-                                <div className="flex gap-2">
-                                    <input type="text" placeholder="輸入手機號碼" className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-blue-500 outline-none" />
-                                    <button className="bg-blue-600 px-6 py-2 rounded-xl text-sm font-bold">送出</button>
-                                </div>
-                            </div>
-                        </div>
+                <section className="pt-32 pb-24 px-8 max-w-7xl mx-auto animate-fade-in text-center">
+                    <h2 className="text-5xl font-black mb-12">全台據點地圖</h2>
+                    <div className="bg-slate-900 h-96 rounded-[3rem] border border-white/10 flex items-center justify-center relative overflow-hidden">
+                         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=1000')] bg-cover opacity-20" />
+                         <i className="fas fa-location-dot text-6xl text-blue-600 drop-shadow-lg animate-bounce"></i>
                     </div>
                 </section>
             );
         }
 
-        // --- 組件: 管理後台 ---
+        // --- 管理後台 ---
         function AdminDashboard({ products }) {
             return (
                 <section className="pt-32 pb-24 px-8 max-w-7xl mx-auto animate-fade-in text-slate-900">
@@ -387,7 +340,6 @@
                             <nav className="space-y-2">
                                 <div className="p-3 bg-blue-600 text-white rounded-xl text-sm font-bold flex items-center gap-3"><i className="fas fa-layer-group"></i> 庫存管理</div>
                                 <div className="p-3 text-slate-400 hover:bg-slate-100 rounded-xl text-sm font-bold flex items-center gap-3"><i className="fas fa-calendar"></i> 試乘預約</div>
-                                <div className="p-3 text-slate-400 hover:bg-slate-100 rounded-xl text-sm font-bold flex items-center gap-3"><i className="fas fa-users"></i> 會員名單</div>
                             </nav>
                         </aside>
                         <main className="flex-1 p-12 bg-white">
@@ -395,38 +347,20 @@
                                 <h2 className="text-3xl font-black">產品庫存管理</h2>
                                 <button className="bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-bold">+ 新增車款</button>
                             </div>
-                            <div className="grid grid-cols-3 gap-6 mb-12">
-                                <div className="bg-blue-50 p-6 rounded-3xl border border-blue-100">
-                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">本月預購</p>
-                                    <p className="text-3xl font-black text-blue-600">128 台</p>
-                                </div>
-                                <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
-                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">總庫存量</p>
-                                    <p className="text-3xl font-black text-emerald-600">47 台</p>
-                                </div>
-                                <div className="bg-amber-50 p-6 rounded-3xl border border-amber-100">
-                                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">待維修件</p>
-                                    <p className="text-3xl font-black text-amber-600">3 件</p>
-                                </div>
-                            </div>
                             <table className="w-full text-left">
-                                <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                     <tr>
                                         <th className="p-4">產品名稱</th>
-                                        <th className="p-4">類別</th>
-                                        <th className="p-4">價格 (NT$)</th>
-                                        <th className="p-4 text-center">庫存</th>
-                                        <th className="p-4 text-right">操作</th>
+                                        <th className="p-4">庫存</th>
+                                        <th className="p-4 text-right">售價 (NT$)</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {products.map(p => (
                                         <tr key={p.id} className="hover:bg-slate-50 transition text-sm">
                                             <td className="p-4 font-bold">{p.name}</td>
-                                            <td className="p-4"><span className="bg-slate-100 px-2 py-1 rounded text-[10px] font-bold">{p.category}</span></td>
-                                            <td className="p-4 font-mono font-bold text-blue-600">{p.price.toLocaleString()}</td>
-                                            <td className="p-4 text-center font-bold">{p.stock}</td>
-                                            <td className="p-4 text-right text-slate-400 hover:text-blue-600 cursor-pointer"><i className="fas fa-edit"></i></td>
+                                            <td className="p-4 font-bold">{p.stock}</td>
+                                            <td className="p-4 text-right font-mono font-bold text-blue-600">{p.price.toLocaleString()}</td>
                                         </tr>
                                     ))}
                                 </tbody>
